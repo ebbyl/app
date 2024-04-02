@@ -1,0 +1,31 @@
+---
+company: ebbcarbon
+internal:
+  secrets:
+    gate_code: 1234
+    alarm_pin: 9876
+  snacks:
+    - tapatio nuts
+    - child-size fruit snacks
+    - apples
+    - bananas
+  users:
+    - ben
+    - matt
+    - todd
+    - dave
+resources:
+  assets:
+    - location: sequim
+      operating_capacity: 100
+      operating_hours: 680
+      footprint: 600 m2
+    - location: burlingame
+      operating_capacity: 100
+      operating_hours: 300
+      footprint: 650 m2
+  collaborating_organizations:
+    - PNNL
+    - NOAA
+    - WHOI
+    - Scripps
