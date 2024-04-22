@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------
+# Common
+# ---------------------------------------------------------------------
+
+# Environments
+.env
+env/
+venv/
+ENV/
+
+# Builds
+build/
+dist/
+lib/
+
+
+# ---------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Distribution / packaging
+.Python
+eggs/
+.eggs/
+lib64/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Unit test / coverage reports
+cov/
+cover/
+htmlcov/
+.coverage
+.coverage.*
+.cache
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual Environments
+.venv
+venv/
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
