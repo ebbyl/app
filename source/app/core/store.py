@@ -1,3 +1,12 @@
+"""
+Store
+
+This module defines an interface for a data store used by our API. 
+Having a separate interface class makes it easier to implement 
+different storage solutions going forward - e.g. Mongo, Dynamo, 
+Postgres, etc.  
+"""
+
 from __future__ import annotations
 
 import abc
@@ -15,8 +24,8 @@ class Store(abc.ABC):
     """
     Store
 
-    This is an abstract class which cannot be directly instatiated. It
-    defines the interface for all concrete storage implementations.
+    This is an abstract class which cannot be directly instantiated. 
+    It defines the interface for all concrete storage implementations.
     """
 
     @classmethod
@@ -42,7 +51,6 @@ class Store(abc.ABC):
 # ---------------------------------------------------------------------
 # Local Store
 # ---------------------------------------------------------------------
-
 
 @dataclasses.dataclass()
 class LocalStore(Store):

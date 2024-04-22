@@ -1,3 +1,11 @@
+"""
+Models
+
+This module defines models/schemas for the data returned by the API. 
+One benefit to this is that the API can return a nice OpenAPI schema.
+These models can also be used for data validation. 
+"""
+
 from __future__ import annotations
 
 from annotated_types import Ge, Le, Predicate
