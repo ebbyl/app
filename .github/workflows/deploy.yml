@@ -1,0 +1,43 @@
+# ---------------------------------------------------------------------
+# Deploy
+# ---------------------------------------------------------------------
+
+# Check, plan, build and apply changes.
+
+name: Deploy
+
+# ---------------------------------------------------------------------
+# Triggers
+# ---------------------------------------------------------------------
+
+# Trigger workflow whenever changes are integrated into the main
+# branch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: "The version to deploy"
+        default: ""
+
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        description: "The version to deploy"
+        default: ""
+
+jobs:
+  apply:
+    name: Apply
+    uses: ./.github/workflows/tofu-apply.yml
+
+    with:
+      workspace: "app-mgmt-us-west-2"
+      cwd: ./infra
+
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
+      EXTRA_VARS: "-var image=${{ inputs.version }}"

@@ -1,0 +1,115 @@
+# ---------------------------------------------------------------------
+# Check
+# ---------------------------------------------------------------------
+
+# Run a series of checks to validate changes
+
+name: Check
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+
+    steps:
+      # ---------------------------------------------------------------
+      # Checkout
+      # ---------------------------------------------------------------
+
+      # Checkout the code so it is available locally on the GitHub
+      # runner.
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # Setup Python
+      # ---------------------------------------------------------------
+
+      # Setup toolchain used for python projects.
+
+      - name: Setup Python
+        uses: ./.github/actions/python-setup@main
+        with:
+          python-version: "3.11"
+          poetry-version: "1.8.2"
+
+      # ---------------------------------------------------------------
+      # Install
+      # ---------------------------------------------------------------
+
+      # Install the source code.
+
+      - name: Install
+        shell: bash
+        run: make install
+
+      # ---------------------------------------------------------------
+      # Type Check
+      # ---------------------------------------------------------------
+
+      # Use Python's typing system to look for issues caused by
+      # incompatible types.
+
+      - name: Type Check
+        shell: bash
+        run: make typecheck
+
+      # ---------------------------------------------------------------
+      # Lint
+      # ---------------------------------------------------------------
+
+      # Look for issues related to coding-style.
+
+      - name: Lint
+        shell: bash
+        run: make lint
+
+      # ---------------------------------------------------------------
+      # Test
+      # ---------------------------------------------------------------
+
+      # Run test suite.
+
+      - name: Test
+        shell: bash
+        run: make test
+
+  # -------------------------------------------------------------------
+  # Plan
+  # -------------------------------------------------------------------
+
+  # Run a plan to see what infrastructure changes are to be applied.
+
+  plan:
+    name: Plan
+    uses: ./.github/workflows/tofu-plan.yml
+
+    with:
+      workspace: "app-mgmt-us-west-2"
+      cwd: ./infra
+
+    secrets:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      AWS_GITHUB_ROLE: ${{ secrets.AWS_GITHUB_ROLE }}
+
+  # -------------------------------------------------------------------
+  # Build
+  # -------------------------------------------------------------------
+
+  # Run workflow used to publish a new build artifact.
+
+  build:
+    name: Build
+    if: github.ref_name == 'main'
+    needs:
+      - check
+      - plan
+
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
