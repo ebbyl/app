@@ -9,7 +9,6 @@ lock:
 
 build: 
 	poetry export --format requirements.txt --output requirements.txt
-	BUILD_TAG=${BUILD_TAG:-app:latest}
 	docker build -t ${BUILD_TAG} .
 	rm -rf requirements.txt
 
