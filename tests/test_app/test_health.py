@@ -13,7 +13,7 @@ class TestHealth:
 
         assert response.status_code == 200
         assert response.json() == {
-            "status": "Healthy", 
+            "status": "Healthy",
             "uptime": pytest.approx(1, 5),
-            "version": "TEST"
+            "version": "TEST",
         }

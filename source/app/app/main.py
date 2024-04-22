@@ -21,7 +21,7 @@ class Health(pydantic.BaseModel):
     """
 
     status: str
-    version: str 
+    version: str
     uptime: t.Union[int, float]
 
 
@@ -33,11 +33,7 @@ def health() -> Health:
     Endpoint for getting checking whether or not the service is healthy.
     """
     version = os.getenv("VERSION", "unknown")
-    return Health(
-        status="Healthy", 
-        version=version,
-        uptime=tools.uptime(
-    ))
+    return Health(status="Healthy", version=version, uptime=tools.uptime())
 
 
 @app.get("/resources")
