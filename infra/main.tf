@@ -26,22 +26,21 @@ data "aws_ecr_image" "latest" {
 # ---------------------------------------------------------------------
 
 locals {
-  image = var.image == null ? var.image : data.aws_ecr_image.latest.image_uri
+  image = var.image != null ? var.image : data.aws_ecr_image.latest.image_uri
 }
 
 module "app" {
   source = "git@github.com:ebbyl/tofu-app-ecs.git?ref=main"
 
-  name     = "ebb"
+  name     = "app"
   image    = local.image
   port     = 8000
   cpu      = 256
   memory   = 512
   replicas = 1
 
-  domain          = "ebb.y4ni.com"
+  domain          = "app.y4ni.com"
   certificate_arn = data.aws_acm_certificate.this.arn
 
   tags = local.tags
 }
-
