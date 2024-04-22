@@ -17,7 +17,7 @@ data "aws_acm_certificate" "this" {
 # Lookup the latest image version.
 
 data "aws_ecr_image" "latest" {
-  repository_name = "myapp"
+  repository_name = "app"
   most_recent     = true
 }
 
