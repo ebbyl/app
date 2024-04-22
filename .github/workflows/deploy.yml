@@ -31,7 +31,7 @@ on:
 jobs:
   apply:
     name: Apply
-    uses: ebbyl/github-workflows/.github/workflows/tofu-apply.yml@main
+    uses: ./.github/workflows/tofu-apply.yml@main
 
     with:
       workspace: "app-mgmt-us-west-2"

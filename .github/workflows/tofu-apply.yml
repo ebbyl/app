@@ -1,0 +1,111 @@
+name: Tofu Apply
+
+on:
+  workflow_call:
+    inputs:
+      workspace:
+        type: string
+        description: Name of the workspace to use.
+        required: true
+      cwd:
+        type: string
+        description: Name of the directory containting terraform files
+        default: "."
+
+    secrets:
+      GH_TOKEN: 
+        description: "GitHub token used to enable private modules."
+        required: true
+      AWS_GITHUB_ROLE:
+        description: "AWS IAM Role ARN used to login to AWS." 
+        required: true
+      EXTRA_VARS: 
+        description: "Extra variables passed to tofu"
+        required: false
+    
+jobs:
+  apply:
+    name: Tofu Apply
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.cwd }}
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      # ---------------------------------------------------------------
+      # Checkout
+      # ---------------------------------------------------------------
+
+      # Checkout the code so it is available locally on the GitHub
+      # runner.
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------
+      # Enable Private Modules
+      # ---------------------------------------------------------------
+
+      # Make it possible to reference Terraform/OpenTofu modules
+      # defined in other GitHub repositories.
+
+      - name: Enable Private Modules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          SOURCE=https://ylathouris:${GITHUB_TOKEN}@github.com
+          TARGET=ssh://git@github.com
+          git config --global url."${SOURCE}".insteadOf "${TARGET}"
+
+      # ---------------------------------------------------------------
+      # AWS Login
+      # ---------------------------------------------------------------
+
+      # Login to AWS using GitHub OIDC
+
+      - name: AWS Login
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ROLE }}
+          aws-region: us-west-2
+
+      # ---------------------------------------------------------------
+      # Setup Tofu
+      # ---------------------------------------------------------------
+
+      # Install and configure OpenTofu.
+
+      - name: Setup Tofu
+        uses: opentofu/setup-opentofu@v1
+
+      # ---------------------------------------------------------------
+      # Tofu Init
+      # ---------------------------------------------------------------
+
+      # Initialize OpenTofu project.
+
+      - name: Tofu Init
+        run: tofu init -input=false
+
+      # ---------------------------------------------------------------
+      # Tofu Apply
+      # ---------------------------------------------------------------
+
+      # Apply infrastructure changes
+
+      - name: Tofu Apply
+        id: apply
+        env:
+          TF_WORKSPACE: ${{ inputs.workspace }}
+        run: |
+          tofu apply \
+            -no-color \
+            -lock-timeout=3s \
+            -auto-approve \
+            -input=false \
+            ${{ secrets.EXTRA_VARS }}

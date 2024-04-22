@@ -1,0 +1,80 @@
+name: Python Setup
+
+inputs:
+  python-version:
+    description: Python Version
+    required: true
+  poetry-version:
+    description: Poetry Version
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    # ---------------------------------------------------------------
+    # Setup Python
+    # ---------------------------------------------------------------
+
+    - name: Setup Python
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    # ---------------------------------------------------------------
+    # Load Poetry Cache
+    # ---------------------------------------------------------------
+
+    # Load poetry install from cache. This prevents installing the
+    # same version of poetry every time.
+
+    - name: Load Poetry Cache
+      id: load-poetry-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.local
+        key: poetry-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ inputs.poetry-version }}
+
+    # ---------------------------------------------------------------
+    # Poetry Install
+    # ---------------------------------------------------------------
+
+    # Install and configure the given version of Poetry. (This step
+    # should be quick if we have previosly installed the same version
+    # of poetry)
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: ${{ inputs.poetry-version }}
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+
+    #----------------------------------------------#
+    # Load Dependency Cache
+    #----------------------------------------------#
+
+    # Load source code dependencies from cache. This prevents
+    # installing the same source code dependencies every time.
+
+    - name: Dependency Cache
+      id: dependency-cache
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: python-deps-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          python-deps-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-
+
+    #----------------------------------------------#
+    # Install Dependencies
+    #----------------------------------------------#
+
+    # Install source code dependencies. This step only runs when
+    # there is nothing found in the dependency cache.
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      shell: bash
+      run: poetry install --no-interaction --no-root
