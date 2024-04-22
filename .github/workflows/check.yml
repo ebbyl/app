@@ -34,7 +34,7 @@ jobs:
       # Setup toolchain used for python projects.
 
       - name: Setup Python
-        uses: ./.github/actions/python-setup@main
+        uses: ./.github/actions/python-setup
         with:
           python-version: "3.11"
           poetry-version: "1.8.2"
